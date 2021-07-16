@@ -19,11 +19,11 @@ a:hover{
     top: 0;
     left: 0;
     right: 0;
-    z-index: 2;
+    z-index: 1;
 }
 
 
-.Container{
+.container{
     padding-top : 85px;
     width : 100%;
     display: flex;
@@ -40,14 +40,6 @@ a:hover{
     margin: 5em;
     width : 600px;
     border-color: #051922;
-}
-
-table{
-    text-align: center;
-}
-
-td{
-    cursor : pointer;
 }
 
 h3{

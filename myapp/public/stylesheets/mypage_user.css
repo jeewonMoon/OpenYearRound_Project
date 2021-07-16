@@ -28,11 +28,6 @@ a:hover{
     z-index: 1;
 }
 
-#dropdownMenuButton1{
-    background-color: #051922;
-    border: none;
-}
-
 .Container{
     padding-top : 100px;
     width : 100%;
@@ -74,8 +69,4 @@ hr{
 
 .change-pwd, .user_info{
     padding-bottom: 5em;
-}
-
-#reserveBtn{
-    display: none;
 }
