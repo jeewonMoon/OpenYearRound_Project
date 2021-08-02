@@ -18,7 +18,7 @@ const get = {
     indexForAdmin : (req, res) => {
         console.log(req.session);
         if(req.session.admin)
-            res.render('index_admin')
+            res.render('index_admin', {adminName : req.session.admin.name})
         else{
             res.redirect('/');
         }
@@ -27,7 +27,7 @@ const get = {
         console.log(req.session);
         if(req.session.user){
             console.log("사용자로 로그인");
-            res.render('index_user', req.session.user);
+            res.render('index_user', {userName : req.session.user.name});
         }
         else
             res.redirect('/');
@@ -35,13 +35,13 @@ const get = {
     //redirect -> url로 이동시킴, render -> 템플릿 출력
     lockerForAdmin : (req, res) => {
         if(req.session.admin)
-            res.render('locker_for_admin');
+            res.render('locker_for_admin', {adminName : req.session.admin.name});
         else
             res.redirect('/');
     },
     lockerForUser : (req, res) => {
         if(req.session.user)
-            res.render('locker_for_user');
+            res.render('locker_for_user', {userName : req.session.user.name});
         else
             res.redirect('/');
     },
@@ -197,27 +197,16 @@ const rest = {
                 res.json(rows);
             }
         })
-    },
-    userName : (req,res) => {
-        console.log('사용자 이름 불러오기');
-        let id = req.session.admin.id;
-        const sql = `SELECT name FROM user WHERE userid = ?`;
-        const params = [id];
-        con.query(sql, params, function(err, rows, fields){
-            if(err){
-                console.log('실패');
-                throw err;
-            }
-            else{
-                console.log('성공');
-                console.log(rows[0]);
-                // res.render('layout/header_user', {userName : rows[0]});    //userName 객체에 정보 담기
-            }
-        })
-    },
-    adminName : (req,res) => {
-        
     }
+    // getUserName : (req,res) => {
+    //     if(req.session.user){
+    //     console.log('사용자 이름 불러오기');
+    //     res.render('layout/header_mypage', {userName : req.session.user.name});    //userInfo 객체에 정보 담기
+    //     }
+    // },
+    // adminName : (req,res) => {
+        
+    // }
 }
 const process = {
     registerProcessForUser : (req, res) => {
