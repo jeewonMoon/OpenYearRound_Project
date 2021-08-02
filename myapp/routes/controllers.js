@@ -3,47 +3,33 @@ const con = require('../db/config');
 const get = {
     index : (req, res) => {
         console.log(req.session);
-        if(req.session.user){
+        if(!(req.session.user) && !(req.session.admin)){
+            console.log('세션 없음');
+            res.render('index', {info : ''});
+        }
+        else if(req.session.user){
             console.log("사용자로 로그인");
-            res.redirect('/index_user');
+            res.render('index', {info : req.session.user, user : "user", admin : ""}); // 빈 값만 안 보내면 되긴 합니다.
         }
         else if(req.session.admin){
             console.log("관리자로 로그인");
-            res.redirect('/index_admin');
+            res.render('index', {info : req.session.admin, user : "", admin : "admin"}); // 빈 값만 안 보내면 되긴 합니다.
         }
-        else
-            res.render('index');
-        res.redirect('/login');
     },
-    indexForAdmin : (req, res) => {
+    locker : (req, res) => {
         console.log(req.session);
-        if(req.session.admin)
-            res.render('index_admin')
-        else{
+        if(!(req.session.user) && !(req.session.admin)){
+            console.log('세션 없음');
             res.redirect('/');
         }
-    },
-    indexForUser : (req, res) => {
-        console.log(req.session);
-        if(req.session.user){
+        else if(req.session.user){
             console.log("사용자로 로그인");
-            res.render('index_user', req.session.user);
+            res.render('locker', {info : req.session.user, user : "user", admin : ""}); // 빈 값만 안 보내면 되긴 합니다.
         }
-        else
-            res.redirect('/');
-    },
-    //redirect -> url로 이동시킴, render -> 템플릿 출력
-    lockerForAdmin : (req, res) => {
-        if(req.session.admin)
-            res.render('locker_for_admin');
-        else
-            res.redirect('/');
-    },
-    lockerForUser : (req, res) => {
-        if(req.session.user)
-            res.render('locker_for_user');
-        else
-            res.redirect('/');
+        else if(req.session.admin){
+            console.log("관리자로 로그인");
+            res.render('locker', {info : req.session.admin, user : "", admin : "admin"}); // 빈 값만 안 보내면 되긴 합니다.
+        }
     },
     registerChoice : (req, res) => {
         res.render('register_choice');
@@ -54,10 +40,14 @@ const get = {
     registerForUser : (req, res) => {
         res.render('register_for_user');
     },
-    mypageForUser : (req, res) => {
+    mypage : (req, res) => {
         //세션이 없는 경우 인덱스 혹은 로그인 페이지로 돌려보내게 할 것입니다.
         console.log(req.session);
-        if(req.session.user){
+        if(!(req.session.user) && !(req.session.admin)){
+            console.log('세션 없음');
+            res.redirect('/');
+        }
+        else if(req.session.user){
             console.log('사용자 정보 불러오기');
             let id = req.session.user.id;
             const sql = `SELECT name, email, userid, phonenum, team FROM user WHERE userid = ?`;
@@ -70,17 +60,12 @@ const get = {
                 else{
                     console.log('성공');
                     console.log(rows[0]);
-                    res.render('mypage_for_user', {userInfo : rows[0]});    //userInfo 객체에 정보 담기
+                    res.render('mypage', {info : req.session.user, user : "user", admin : ""}); // 빈 값만 안 보내면 되긴 합니다.
+                    //res.render('mypage', {userInfo : rows[0]});    //userInfo 객체에 정보 담기
                 }
             })
         }
-        else
-            res.redirect('/');
-    },
-    mypageForAdmin : (req, res) => {
-        //세션이 없는 경우 인덱스 혹은 로그인 페이지로 돌려보내게 할 것입니다.
-        console.log(req.session);
-        if(req.session.admin){
+        else if(req.session.admin){
             console.log('관리자 정보 불러오기');
             let id = req.session.admin.id;
             const sql = `SELECT name, email, adminid, phonenum, team FROM admin WHERE adminid = ?`;
@@ -93,12 +78,10 @@ const get = {
                 else{
                     console.log('성공');
                     console.log(rows[0]);
-                    res.render('mypage_for_admin', {adminInfo : rows[0]});    //userInfo 객체에 정보 담기
+                    res.render('mypage', {info : req.session.admin, user : "", admin : "admin"}); // 빈 값만 안 보내면 되긴 합니다.
                 }
             })
         }
-        else
-            res.redirect('/');
     },
     login : (req, res) => {
         //데이터베이스 확인 후, 작업
@@ -186,7 +169,7 @@ const rest = {
     },
     findAdminById : (req, res) => {
         let id = req.params.id;
-        const sql = `SELECT * FROM USER WHERE userid = ?`;
+        const sql = `SELECT * FROM USER WHERE adminid = ?`;
         const params = [id];
         con.query(sql, params, function(err, rows, fields){
             console.log('실행됨');
@@ -198,6 +181,15 @@ const rest = {
             }
         })
     }
+    // getUserName : (req,res) => {
+    //     if(req.session.user){
+    //     console.log('사용자 이름 불러오기');
+    //     res.render('layout/header_mypage', {userName : req.session.user.name});    //userInfo 객체에 정보 담기
+    //     }
+    // },
+    // adminName : (req,res) => {
+        
+    // }
 }
 const process = {
     registerProcessForUser : (req, res) => {
@@ -271,7 +263,8 @@ const process = {
                     }
                     console.log("로그인 처음 됨");
                 }
-                res.redirect('/index_user');
+                res.redirect('/');
+                //res.redirect('/index_user');
             }
             else{
                 //로그인이 안 된 경우
@@ -307,7 +300,8 @@ const process = {
                     }
                     console.log("로그인 처음 됨");
                 }
-                res.redirect('/index_admin');
+                res.redirect('/');
+                //res.redirect('/index_admin');
             }
             else{
                 //로그인이 안 된 경우
@@ -340,7 +334,6 @@ const process = {
                 res.redirect('/');
             }
         })
-        // res.render('index');
     },
     deleteProcessForAdmin : (req, res) => {
         console.log(req.session.admin.id);
@@ -365,7 +358,6 @@ const process = {
                 res.redirect('/');
             }
         })
-        // res.render('index');
     },
 
 }
