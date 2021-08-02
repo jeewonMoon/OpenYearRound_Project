@@ -186,7 +186,7 @@ const rest = {
     },
     findAdminById : (req, res) => {
         let id = req.params.id;
-        const sql = `SELECT * FROM USER WHERE userid = ?`;
+        const sql = `SELECT * FROM USER WHERE adminid = ?`;
         const params = [id];
         con.query(sql, params, function(err, rows, fields){
             console.log('실행됨');
@@ -197,6 +197,26 @@ const rest = {
                 res.json(rows);
             }
         })
+    },
+    userName : (req,res) => {
+        console.log('사용자 이름 불러오기');
+        let id = req.session.admin.id;
+        const sql = `SELECT name FROM user WHERE userid = ?`;
+        const params = [id];
+        con.query(sql, params, function(err, rows, fields){
+            if(err){
+                console.log('실패');
+                throw err;
+            }
+            else{
+                console.log('성공');
+                console.log(rows[0]);
+                // res.render('layout/header_user', {userName : rows[0]});    //userName 객체에 정보 담기
+            }
+        })
+    },
+    adminName : (req,res) => {
+        
     }
 }
 const process = {
